@@ -1,7 +1,9 @@
 # nfc_reader
 
-
+# Branch Public
 
 ## Getting Started
 
-run terminal : flutter pub get
+# silahkan bagi yang ingin berkontribusi untuk menyempurnakan fitur
+
+Run terminal : flutter pub get
