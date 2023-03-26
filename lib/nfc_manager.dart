@@ -3,8 +3,6 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:nfc_manager/nfc_manager.dart';
 import 'dart:typed_data';
-import 'package:number_system/number_system.dart';
-import 'package:flutter_nfc_kit/flutter_nfc_kit.dart';
 
 class NfcReder extends StatefulWidget {
   NfcReder({super.key});
@@ -15,7 +13,12 @@ class NfcReder extends StatefulWidget {
 
 class _NfcRederState extends State<NfcReder> {
   ValueNotifier<dynamic> result = ValueNotifier(null);
-  String _identifier = 'Waiting for NFC tag...';
+
+  @override
+  void initState() {
+    super.initState();
+    _tagRead();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class _NfcRederState extends State<NfcReder> {
                     direction: Axis.vertical,
                     children: [
                       Flexible(
-                        flex: 2,
+                        flex: 1,
                         child: Container(
                           margin: EdgeInsets.all(4),
                           constraints: BoxConstraints.expand(),
@@ -40,25 +43,32 @@ class _NfcRederState extends State<NfcReder> {
                           child: SingleChildScrollView(
                             child: ValueListenableBuilder<dynamic>(
                               valueListenable: result,
-                              builder: (context, value, _) =>
-                                  Text("${value ?? ' '}"),
+                              builder: (context, value, _) => Padding(
+                                padding: const EdgeInsets.all(18.0),
+                                child: Center(child: Text("${value ?? ' '}")),
+                              ),
                             ),
                           ),
                         ),
                       ),
                       Flexible(
-                        flex: 3,
+                        flex: 12,
                         child: GridView.count(
-                          padding: EdgeInsets.all(4),
+                          padding: const EdgeInsets.all(4),
                           crossAxisCount: 2,
                           childAspectRatio: 4,
                           crossAxisSpacing: 4,
                           mainAxisSpacing: 4,
                           children: [
-                            ElevatedButton(
-                                child: Text('Tag Read'), onPressed: _tagRead),
-                            ElevatedButton(
-                                child: Text('test'), onPressed: _test),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Center(
+                                    child:
+                                        const Text("Silahkan tempelkan kartu")),
+                              ],
+                            )
                           ],
                         ),
                       ),
@@ -73,18 +83,14 @@ class _NfcRederState extends State<NfcReder> {
   void _tagRead() {
     NfcManager.instance.startSession(onDiscovered: (NfcTag tag) async {
       // result.value = tag.data.toString();
-      print('tag : ${tag.data}');
+      // print('tag : ${tag.data}');
       String identifier = tag.data['nfca']['identifier']
           .map((e) => e.toRadixString(16).padLeft(2, '0'))
           .join(':');
-      print(identifier);
+      // print(identifier);
       result.value = identifier;
-
-      NfcManager.instance.stopSession();
+      await NfcManager.instance.stopSession();
+      _tagRead();
     });
-  }
-
-  void _test() {
-    print('object');
   }
 }
